@@ -7,6 +7,7 @@ import AdminDashboard from './components/AdminDashboard'
 import DeviceManagement from './components/DeviceManagement'
 import UserManagement from './components/UserManagement'
 import TheftManagement from './components/TheftManagement'
+import CommunicationManagement from './components/CommunicationManagement'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -17,7 +18,8 @@ function App() {
     {/* <AdminDashboard /> */}
     {/* <DeviceManagement /> */}
     {/* <UserManagement /> */}
-    <TheftManagement />
+    {/* <TheftManagement /> */}
+    <CommunicationManagement />
     </>
   )
 }
