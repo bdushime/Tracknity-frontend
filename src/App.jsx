@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import Sidebar from './components/Sidebar'
 import AdminDashboard from './components/AdminDashboard'
+import DeviceManagement from './components/DeviceManagement'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -11,7 +12,8 @@ function App() {
   return (
     <>
     {/* <Sidebar /> */}
-    <AdminDashboard />
+    {/* <AdminDashboard /> */}
+    <DeviceManagement />
     </>
   )
 }
