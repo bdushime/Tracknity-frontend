@@ -5,6 +5,8 @@ import './App.css'
 import Sidebar from './components/Sidebar'
 import AdminDashboard from './components/AdminDashboard'
 import DeviceManagement from './components/DeviceManagement'
+import UserManagement from './components/UserManagement'
+import TheftManagement from './components/TheftManagement'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -13,7 +15,9 @@ function App() {
     <>
     {/* <Sidebar /> */}
     {/* <AdminDashboard /> */}
-    <DeviceManagement />
+    {/* <DeviceManagement /> */}
+    {/* <UserManagement /> */}
+    <TheftManagement />
     </>
   )
 }
