@@ -1,27 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Sidebar from './components/Sidebar'
-import AdminDashboard from './components/AdminDashboard'
-import DeviceManagement from './components/DeviceManagement'
-import UserManagement from './components/UserManagement'
-import TheftManagement from './components/TheftManagement'
-import CommunicationManagement from './components/CommunicationManagement'
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import AdminDashboard from './components/AdminDashboard';
+import DeviceManagement from './components/DeviceManagement';
+import UserManagement from './components/UserManagement';
+import TheftManagement from './components/TheftManagement';
+import CommunicationManagement from './components/CommunicationManagement';
 
-function App() {
-  const [count, setCount] = useState(0)
 
+const App = () => {
   return (
-    <>
-    {/* <Sidebar /> */}
-    {/* <AdminDashboard /> */}
-    {/* <DeviceManagement /> */}
-    {/* <UserManagement /> */}
-    {/* <TheftManagement /> */}
-    <CommunicationManagement />
-    </>
-  )
-}
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<AdminDashboard />} />
+          <Route path="/devices" element={<DeviceManagement />} />
+          <Route path="/users" element={<UserManagement />} />
+          <Route path="/theft-reports" element={<TheftManagement />} />
+          <Route path="/communications" element={<CommunicationManagement />} />
+          {/* <Route path="/settings" element={<Settings />} /> */}
+        </Routes>
+      </Layout>
+    </Router>
+  );
+};
 
-export default App
+export default App;
