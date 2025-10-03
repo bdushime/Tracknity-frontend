@@ -11,44 +11,62 @@ import {
   Smartphone, 
   User, 
   Calendar, 
-  Monitor, 
   RefreshCw, 
   CheckCircle, 
   XCircle, 
-  Clock
+  Clock,
+  AlertTriangle,
+  MapPin,
+  Store,
+  Package,
+  ShieldAlert
 } from 'lucide-react';
 
-// Status Badge Component (reused in both views)
+// Status Badge Component - Device Guard Specific
 const StatusBadge = ({ status }) => {
   const getStatusStyle = (status) => {
     if (status === 'Active') {
       return 'bg-green-100 text-green-800 border-green-200';
-    } else if (status === 'Inactive') {
-      return 'bg-red-100 text-red-800 border-red-200';
-    } else if (status === 'Locked') {
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    } else if (status === 'Sold') {
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    } else if (status === 'Available') {
+      return 'bg-purple-100 text-purple-800 border-purple-200';
     } else if (status === 'Stolen') {
       return 'bg-red-100 text-red-800 border-red-200';
+    } else if (status === 'Recovered') {
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    } else if (status === 'Transferred') {
+      return 'bg-gray-100 text-gray-800 border-gray-200';
     } else {
       return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'Active': return <CheckCircle size={14} />;
+      case 'Stolen': return <ShieldAlert size={14} />;
+      case 'Available': return <Package size={14} />;
+      default: return null;
+    }
+  };
+
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusStyle(status)}`}>
+    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border ${getStatusStyle(status)}`}>
+      {getStatusIcon(status)}
       {status}
     </span>
   );
 };
 
-// Transfer Request Status Badge
+// Transfer Status Badge
 const TransferStatusBadge = ({ status }) => {
   const getTransferStatusStyle = (status) => {
     if (status === 'pending') {
       return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    } else if (status === 'approved') {
+    } else if (status === 'completed') {
       return 'bg-green-100 text-green-800 border-green-200';
-    } else if (status === 'rejected') {
+    } else if (status === 'cancelled') {
       return 'bg-red-100 text-red-800 border-red-200';
     } else {
       return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -58,8 +76,8 @@ const TransferStatusBadge = ({ status }) => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'pending': return <Clock size={14} />;
-      case 'approved': return <CheckCircle size={14} />;
-      case 'rejected': return <XCircle size={14} />;
+      case 'completed': return <CheckCircle size={14} />;
+      case 'cancelled': return <XCircle size={14} />;
       default: return null;
     }
   };
@@ -72,56 +90,92 @@ const TransferStatusBadge = ({ status }) => {
   );
 };
 
-// Info Card Component for Device Details
+// Info Card Component
 const InfoCard = ({ title, children }) => (
-  <div className="bg-[#8D8DC7]/10 rounded-lg border border-[#8D8DC7] p-6">
-    <h3 className="text-white text-lg font-semibold mb-4">{title}</h3>
+  <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+    <h3 className="text-gray-900 text-lg font-semibold mb-4">{title}</h3>
     {children}
   </div>
 );
 
-// Info Row Component for Device Details
+// Info Row Component
 const InfoRow = ({ label, value, icon: Icon }) => (
-  <div className="flex items-center justify-between py-3 border-b border-[#8D8DC7]/30 last:border-b-0">
+  <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">
     <div className="flex items-center gap-3">
-      {Icon && <Icon size={16} className="text-[#8D8DC7]" />}
-      <span className="text-[#BEBEE0] text-sm font-medium">{label}:</span>
+      {Icon && <Icon size={16} className="text-gray-600" />}
+      <span className="text-gray-600 text-sm font-medium">{label}:</span>
     </div>
-    <div className="text-white font-medium">{value}</div>
+    <div className="text-gray-900 font-medium">{value}</div>
   </div>
 );
 
-// Device Details View Component
+// Device Details View - Device Guard Specific
 const DeviceDetailsView = ({ device, onBack }) => {
-  // Sample transfer request data - replace with real API call
-  const transferRequest = {
-    id: 'TR001',
-    status: 'pending', // pending, approved, rejected, or null for no request
-    requestedBy: 'Jane Smith',
-    requestDate: '2023-10-20',
-    reason: 'Employee department transfer',
-    newOwner: 'Jane Smith',
-    requestedDate: '2023-10-20 14:30'
+  // Extended device data
+  const extendedDevice = {
+    ...device,
+    imei: device.imei || '353456789012345',
+    brand: device.brand || 'Samsung',
+    model: device.model || 'Galaxy S21',
+    storage: device.storage || '128GB',
+    color: device.color || 'Phantom Gray',
+    condition: device.condition || 'Like New',
+    purchasePrice: device.purchasePrice || '450,000 RWF',
+    lastLocation: device.lastLocation || 'Kimironko, Kigali',
+    warrantyExpiry: device.warrantyExpiry || '2026-03-30'
   };
 
-  // Handle button clicks
+  // Ownership history
+  const ownershipHistory = [
+    {
+      from: 'Tech Shop Rwanda',
+      to: device.owner,
+      date: device.registrationDate,
+      type: 'Original Sale',
+      price: extendedDevice.purchasePrice
+    }
+  ];
+
+  // Transfer request if exists
+  const transferRequest = device.status === 'Transferred' ? {
+    id: 'TRF-2026-5678',
+    status: 'completed',
+    from: device.owner,
+    to: 'Mary Uwimana',
+    date: '2026-03-15',
+    price: '400,000 RWF'
+  } : null;
+
+  // Alert/Incident history
+  const incidents = device.status === 'Stolen' || device.status === 'Recovered' ? [
+    {
+      type: 'stolen',
+      date: '2025-10-15 18:45',
+      location: 'Nyabugogo Bus Station',
+      reportedBy: device.owner,
+      status: device.status === 'Recovered' ? 'resolved' : 'active'
+    }
+  ] : [];
+
   const handleEditDevice = () => {
     console.log('Edit device:', device.deviceId);
     alert(`Edit device ${device.deviceName} - add your logic here`);
   };
 
-  const handleTransferAction = (action) => {
-    console.log(`Transfer ${action}:`, transferRequest.id);
-    alert(`Transfer ${action} functionality - add your logic here`);
+  const handleFlagDevice = () => {
+    console.log('Flag device:', device.deviceId);
+    if (confirm(`Flag device ${device.deviceName} as suspicious?`)) {
+      alert('Flag device functionality - add your logic here');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#343264] p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       {/* Header Section */}
       <div className="mb-6">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-[#BEBEE0] hover:text-white mb-4 transition-colors"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
         >
           <ArrowLeft size={20} />
           Back to Device Management
@@ -129,106 +183,199 @@ const DeviceDetailsView = ({ device, onBack }) => {
         
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-white text-3xl font-bold mb-2">Device Details</h1>
-            <p className="text-[#BEBEE0]">Viewing details for {device.deviceName}</p>
+            <h1 className="text-gray-900 text-3xl font-bold mb-2">Device Details</h1>
+            <p className="text-gray-600">{extendedDevice.brand} {extendedDevice.model} • IMEI: ***{extendedDevice.imei.slice(-4)}</p>
           </div>
           <div className="flex items-center gap-3">
             <StatusBadge status={device.status} />
             <button
               onClick={handleEditDevice}
-              className="px-4 py-2 bg-[#BEBEE0] hover:bg-white text-[#343264] rounded-lg transition-colors font-medium"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium"
             >
-              Edit Device
+              Edit
             </button>
+            {device.status !== 'Stolen' && (
+              <button
+                onClick={handleFlagDevice}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors font-medium"
+              >
+                Flag as Suspicious
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Alert for Stolen Devices */}
+      {device.status === 'Stolen' && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <ShieldAlert size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-gray-900 font-semibold mb-1">This Device is Reported Stolen</h4>
+              <p className="text-gray-700 text-sm">
+                Reported by {device.owner} on {incidents[0]?.date}. All shops have been notified. 
+                Any attempt to resell this device will be blocked.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Basic Information */}
-        <InfoCard title="Basic Information">
+        <InfoCard title="Device Information">
           <div className="space-y-1">
-            <InfoRow label="Device ID" value={device.deviceId} icon={Smartphone} />
-            <InfoRow label="Device Name" value={device.deviceName} icon={Monitor} />
-            <InfoRow label="Owner" value={device.owner} icon={User} />
-            <InfoRow label="Type" value={device.type} />
-            <InfoRow label="Registration Date" value={device.registrationDate} icon={Calendar} />
+            <InfoRow label="Device ID" value={device.deviceId} />
+            <InfoRow label="IMEI" value={`***********${extendedDevice.imei.slice(-4)}`} icon={Smartphone} />
+            <InfoRow label="Brand" value={extendedDevice.brand} />
+            <InfoRow label="Model" value={extendedDevice.model} />
+            <InfoRow label="Storage" value={extendedDevice.storage} />
+            <InfoRow label="Color" value={extendedDevice.color} />
+            <InfoRow label="Condition" value={extendedDevice.condition} />
             <InfoRow label="Status" value={<StatusBadge status={device.status} />} />
           </div>
         </InfoCard>
 
-        {/* Technical Details */}
-        <InfoCard title="Technical Details">
+        {/* Ownership Details */}
+        <InfoCard title="Ownership & Shop Details">
           <div className="space-y-1">
-            <InfoRow label="Serial Number" value={device.serialNumber || 'N/A'} />
-            <InfoRow label="Model" value={device.model || device.deviceName} />
-            <InfoRow label="Operating System" value={device.operatingSystem || 'N/A'} />
-            <InfoRow label="Last Seen" value={device.lastSeen || 'N/A'} />
-            <InfoRow label="Location" value={device.location || 'Not specified'} />
+            <InfoRow label="Current Owner" value={device.owner} icon={User} />
+            <InfoRow label="Sold By" value={device.shop} icon={Store} />
+            <InfoRow label="Registration Date" value={device.registrationDate} icon={Calendar} />
+            <InfoRow label="Purchase Price" value={extendedDevice.purchasePrice} />
+            <InfoRow label="Receipt ID" value={device.receiptId || 'TSR-2025-001234'} />
+            <InfoRow label="Warranty Expiry" value={extendedDevice.warrantyExpiry} />
+            {device.lastLocation && (
+              <InfoRow label="Last Known Location" value={extendedDevice.lastLocation} icon={MapPin} />
+            )}
           </div>
         </InfoCard>
 
-        {/* Transfer Request Section */}
+        {/* Ownership History */}
         <div className="lg:col-span-2">
-          <InfoCard title="Ownership Transfer">
-            {transferRequest.status ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-[#BEBEE0] font-medium">Active Transfer Request</h4>
-                  <TransferStatusBadge status={transferRequest.status} />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <InfoRow label="Request ID" value={transferRequest.id} />
-                  <InfoRow label="Requested By" value={transferRequest.requestedBy} />
-                  <InfoRow label="Request Date" value={transferRequest.requestDate} />
-                  <InfoRow label="New Owner" value={transferRequest.newOwner} />
-                </div>
-                
-                <div className="mt-4">
-                  <InfoRow label="Reason" value={transferRequest.reason} />
-                </div>
-
-                {transferRequest.status === 'pending' && (
-                  <div className="flex items-center gap-3 pt-4 border-t border-[#8D8DC7]/30">
-                    <button
-                      onClick={() => handleTransferAction('approve')}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
-                    >
-                      Approve Transfer
-                    </button>
-                    <button
-                      onClick={() => handleTransferAction('reject')}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium"
-                    >
-                      Reject Transfer
-                    </button>
+          <InfoCard title="Ownership History">
+            <div className="space-y-4">
+              {ownershipHistory.map((transfer, index) => (
+                <div key={index} className="flex items-start gap-4 pb-4 border-b border-gray-200 last:border-b-0">
+                  <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <RefreshCw size={20} className="text-white" />
                   </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <RefreshCw size={48} className="mx-auto mb-4 text-[#8D8DC7] opacity-50" />
-                <h4 className="text-[#BEBEE0] font-medium mb-2">No Transfer Request</h4>
-                <p className="text-[#8D8DC7] text-sm">
-                  There are currently no pending ownership transfer requests for this device.
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-gray-900 font-medium">{transfer.type}</p>
+                        <p className="text-gray-600 text-sm">From: {transfer.from} → To: {transfer.to}</p>
+                        <p className="text-gray-500 text-xs mt-1">Date: {transfer.date} • Price: {transfer.price}</p>
+                      </div>
+                      <span className="text-gray-500 text-xs">{index + 1}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {transferRequest && (
+                <div className="flex items-start gap-4 pb-4">
+                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle size={20} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-gray-900 font-medium">Ownership Transferred</p>
+                        <p className="text-gray-600 text-sm">From: {transferRequest.from} → To: {transferRequest.to}</p>
+                        <p className="text-gray-500 text-xs mt-1">
+                          Date: {transferRequest.date} • Price: {transferRequest.price} • Transfer ID: {transferRequest.id}
+                        </p>
+                      </div>
+                      <TransferStatusBadge status={transferRequest.status} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {ownershipHistory.length === 1 && !transferRequest && (
+                <p className="text-gray-500 text-sm text-center py-2">
+                  Original owner • No transfers yet
                 </p>
-              </div>
-            )}
+              )}
+            </div>
           </InfoCard>
         </div>
+
+        {/* Incidents/Alerts Section */}
+        {incidents.length > 0 && (
+          <div className="lg:col-span-2">
+            <InfoCard title="Incidents & Alerts">
+              <div className="space-y-4">
+                {incidents.map((incident, index) => (
+                  <div key={index} className="flex items-start gap-4 pb-4 border-b border-gray-200 last:border-b-0">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      incident.status === 'resolved' ? 'bg-yellow-500' : 'bg-red-500'
+                    }`}>
+                      <ShieldAlert size={20} className="text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-gray-900 font-medium">
+                            Device Reported {incident.type === 'stolen' ? 'Stolen' : 'Lost'}
+                          </p>
+                          <p className="text-gray-600 text-sm">Reported by: {incident.reportedBy}</p>
+                          <p className="text-gray-500 text-xs mt-1">
+                            Date: {incident.date} • Location: {incident.location}
+                          </p>
+                          <p className="text-gray-500 text-xs mt-1">
+                            Status: {incident.status === 'resolved' ? 'Recovered' : 'Active Alert'}
+                          </p>
+                        </div>
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          incident.status === 'resolved' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {incident.status === 'resolved' ? 'Resolved' : 'Active'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </InfoCard>
+          </div>
+        )}
       </div>
 
-      {/* Activity History (Placeholder for future) */}
+      {/* Activity History */}
       <div className="mt-6">
         <InfoCard title="Recent Activity">
-          <div className="text-center py-8">
-            <Clock size={48} className="mx-auto mb-4 text-[#8D8DC7] opacity-50" />
-            <h4 className="text-[#BEBEE0] font-medium mb-2">Activity Log</h4>
-            <p className="text-[#8D8DC7] text-sm">
-              Device activity history will be displayed here.
-            </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 py-2 border-b border-gray-200">
+              <div className="w-2 h-2 rounded-full bg-green-400"></div>
+              <div className="flex-1">
+                <p className="text-gray-900 text-sm">Device registered</p>
+                <p className="text-gray-500 text-xs">By {device.shop} • {device.registrationDate}</p>
+              </div>
+            </div>
+            {device.status === 'Sold' && (
+              <div className="flex items-center gap-3 py-2 border-b border-gray-200">
+                <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                <div className="flex-1">
+                  <p className="text-gray-900 text-sm">Device sold to customer</p>
+                  <p className="text-gray-500 text-xs">Owner: {device.owner} • {device.registrationDate}</p>
+                </div>
+              </div>
+            )}
+            {device.status === 'Stolen' && (
+              <div className="flex items-center gap-3 py-2">
+                <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                <div className="flex-1">
+                  <p className="text-gray-900 text-sm">Device reported stolen</p>
+                  <p className="text-gray-500 text-xs">{incidents[0]?.date} • {incidents[0]?.location}</p>
+                </div>
+              </div>
+            )}
           </div>
         </InfoCard>
       </div>
@@ -236,20 +383,20 @@ const DeviceDetailsView = ({ device, onBack }) => {
   );
 };
 
-// Tab Button - for switching between All, Active, Locked, etc.
+// Tab Button
 const TabButton = ({ label, isActive, onClick, count }) => {
   return (
     <button
       onClick={onClick}
       className={`px-4 py-2 text-sm font-medium transition-colors ${
         isActive 
-          ? 'text-[#8D8DC7] border-b-2 border-[#8D8DC7]' 
-          : 'text-[#BEBEE0] hover:text-white'
+          ? 'text-indigo-600 border-b-2 border-indigo-600' 
+          : 'text-gray-600 hover:text-gray-900'
       }`}
     >
       {label}
       {count !== undefined && (
-        <span className="ml-2 px-2 py-1 text-xs bg-[#343264] text-[#BEBEE0] rounded-full">
+        <span className="ml-2 px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
           {count}
         </span>
       )}
@@ -257,12 +404,12 @@ const TabButton = ({ label, isActive, onClick, count }) => {
   );
 };
 
-// Action Menu - the three dots menu for each device row
+// Action Menu
 const ActionMenu = ({ device, onAction }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleAction = (actionType) => {
-    setIsOpen(false); // Close menu
+    setIsOpen(false);
     if (onAction) {
       onAction(actionType, device);
     }
@@ -272,85 +419,81 @@ const ActionMenu = ({ device, onAction }) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-1 text-[#BEBEE0] hover:text-white hover:bg-[#8D8DC7] rounded transition-colors"
+        className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
       >
         <MoreVertical size={16} />
       </button>
       
       {isOpen && (
-        <div className="absolute right-0 top-8 w-48 bg-[#343264] border border-[#8D8DC7] rounded-lg shadow-lg z-10">
-          <button
-            onClick={() => handleAction('view')}
-            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[#BEBEE0] hover:bg-[#8D8DC7] hover:text-white transition-colors"
-          >
-            <Eye size={14} />
-            View Details
-          </button>
-          <button
-            onClick={() => handleAction('edit')}
-            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[#BEBEE0] hover:bg-[#8D8DC7] hover:text-white transition-colors"
-          >
-            <Edit size={14} />
-            Edit Device
-          </button>
-          <button
-            onClick={() => handleAction('delete')}
-            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-[#8D8DC7] hover:text-red-300 transition-colors"
-          >
-            <Trash2 size={14} />
-            Delete Device
-          </button>
-        </div>
+        <>
+          <div 
+            className="fixed inset-0 z-10" 
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute right-0 top-8 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+            <button
+              onClick={() => handleAction('view')}
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Eye size={14} />
+              View Details
+            </button>
+            <button
+              onClick={() => handleAction('edit')}
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Edit size={14} />
+              Edit Device
+            </button>
+            {device.status !== 'Stolen' && (
+              <button
+                onClick={() => handleAction('flag')}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-yellow-600 hover:bg-gray-50 transition-colors"
+              >
+                <AlertTriangle size={14} />
+                Flag as Stolen
+              </button>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
 };
 
-// Device Row - represents one device in the table
+// Device Row
 const DeviceRow = ({ device, isSelected, onSelect, onAction }) => {
   return (
-    <tr className="border-b border-[#8D8DC7] hover:bg-[#343264]/30 transition-colors">
-      {/* Checkbox */}
+    <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
       <td className="px-4 py-4">
         <input
           type="checkbox"
           checked={isSelected}
           onChange={(e) => onSelect(e.target.checked)}
-          className="w-4 h-4 text-[#8D8DC7] bg-[#343264] border-[#8D8DC7] rounded focus:ring-[#8D8DC7] focus:ring-2"
+          className="w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2"
         />
       </td>
-      
-      {/* Device ID */}
       <td className="px-4 py-4">
-        <span className="text-white font-medium">{device.deviceId}</span>
+        <span className="text-gray-900 font-medium">{device.deviceId}</span>
       </td>
-      
-      {/* Device Name */}
       <td className="px-4 py-4">
-        <span className="text-[#BEBEE0]">{device.deviceName}</span>
+        <div>
+          <span className="text-gray-700">{device.deviceName}</span>
+          <p className="text-gray-500 text-xs mt-1">IMEI: ***{device.imei?.slice(-4) || '****'}</p>
+        </div>
       </td>
-      
-      {/* Owner */}
       <td className="px-4 py-4">
-        <span className="text-[#BEBEE0]">{device.owner}</span>
+        <span className="text-gray-700">{device.owner}</span>
       </td>
-      
-      {/* Type */}
       <td className="px-4 py-4">
-        <span className="text-[#BEBEE0]">{device.type}</span>
+        <span className="text-gray-700">{device.shop}</span>
       </td>
-      
-      {/* Status */}
       <td className="px-4 py-4">
         <StatusBadge status={device.status} />
       </td>
-      
-      {/* Registration Date */}
       <td className="px-4 py-4">
-        <span className="text-[#8D8DC7] text-sm">{device.registrationDate}</span>
+        <span className="text-gray-600 text-sm">{device.registrationDate}</span>
       </td>
-      
-      {/* Actions */}
       <td className="px-4 py-4">
         <ActionMenu device={device} onAction={onAction} />
       </td>
@@ -358,81 +501,108 @@ const DeviceRow = ({ device, isSelected, onSelect, onAction }) => {
   );
 };
 
-// Main Component
+// Main Component - Device Guard Device Management
 const DeviceManagement = () => {
-  // State - these store the current values
   const [activeTab, setActiveTab] = useState('All Devices');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDevices, setSelectedDevices] = useState(new Set());
-  
-  // NEW: State to control which view to show
-  const [currentView, setCurrentView] = useState('list'); // 'list' or 'details'
+  const [currentView, setCurrentView] = useState('list');
   const [selectedDevice, setSelectedDevice] = useState(null);
 
-  // Sample data - replace this with real data from your backend later
+  // Device Guard specific device data
   const devices = [
     {
       deviceId: 'DEV001',
-      deviceName: 'MacBook Pro 16"',
-      owner: 'John Doe',
-      type: 'Laptop',
+      deviceName: 'Samsung Galaxy S21',
+      imei: '353456789012345',
+      owner: 'John Mugisha',
+      shop: 'Tech Shop Rwanda',
+      type: 'Mobile',
       status: 'Active',
-      registrationDate: '2023-05-15',
-      lastSeen: '2023-10-25'
+      registrationDate: '2025-09-30',
+      receiptId: 'TSR-2025-001234'
     },
     {
       deviceId: 'DEV002',
-      deviceName: 'iPhone 14 Pro',
-      owner: 'Jane Smith',
+      deviceName: 'iPhone 13 Pro',
+      imei: '353456789056789',
+      owner: 'Sarah Kamikazi',
+      shop: 'Mobile Zone',
       type: 'Mobile',
       status: 'Active',
-      registrationDate: '2023-06-22',
-      lastSeen: '2023-10-26'
+      registrationDate: '2025-09-28',
+      receiptId: 'MZ-2025-000567'
     },
     {
       deviceId: 'DEV003',
-      deviceName: 'Dell XPS 15',
-      owner: 'Robert Johnson',
-      type: 'Laptop',
-      status: 'Inactive',
-      registrationDate: '2023-03-10',
-      lastSeen: '2023-09-15'
+      deviceName: 'Samsung A54',
+      imei: '353456789011122',
+      owner: 'Peter Nkusi',
+      shop: 'Phone Hub',
+      type: 'Mobile',
+      status: 'Stolen',
+      registrationDate: '2025-10-01',
+      receiptId: 'PH-2025-000234'
     },
     {
       deviceId: 'DEV004',
-      deviceName: 'iPad Air',
-      owner: 'Emily Davis',
-      type: 'Tablet',
-      status: 'Active',
-      registrationDate: '2023-07-05',
-      lastSeen: '2023-10-24'
+      deviceName: 'iPhone 12',
+      imei: '353456789023456',
+      owner: 'Mary Uwimana',
+      shop: 'Tech Shop Rwanda',
+      type: 'Mobile',
+      status: 'Transferred',
+      registrationDate: '2025-03-15',
+      receiptId: 'TSR-2025-000012'
     },
     {
       deviceId: 'DEV005',
       deviceName: 'Samsung Galaxy S23',
-      owner: 'Michael Wilson',
+      imei: '353456789034567',
+      owner: 'Tech Shop Rwanda',
+      shop: 'Tech Shop Rwanda',
       type: 'Mobile',
-      status: 'Locked',
-      registrationDate: '2023-04-18',
-      lastSeen: '2023-10-10'
+      status: 'Available',
+      registrationDate: '2025-10-02',
+      receiptId: null
+    },
+    {
+      deviceId: 'DEV006',
+      deviceName: 'iPhone 14 Pro',
+      imei: '353456789045678',
+      owner: 'John Mugisha',
+      shop: 'Mobile Zone',
+      type: 'Mobile',
+      status: 'Recovered',
+      registrationDate: '2025-08-10',
+      receiptId: 'MZ-2025-000345'
+    },
+    {
+      deviceId: 'DEV007',
+      deviceName: 'Samsung A33',
+      imei: '353456789067890',
+      owner: 'Grace Mukamana',
+      shop: 'Phone Hub',
+      type: 'Mobile',
+      status: 'Sold',
+      registrationDate: '2025-09-25',
+      receiptId: 'PH-2025-000189'
     }
   ];
 
-  // Filter devices by active tab (All, Active, Locked, etc.)
   const getFilteredDevices = () => {
     let filtered = devices;
     
-    // Filter by tab
     if (activeTab !== 'All Devices') {
       filtered = filtered.filter(device => device.status === activeTab);
     }
     
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(device =>
         device.deviceId.toLowerCase().includes(searchTerm.toLowerCase()) ||
         device.deviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        device.owner.toLowerCase().includes(searchTerm.toLowerCase())
+        device.owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        device.imei.includes(searchTerm)
       );
     }
     
@@ -441,19 +611,18 @@ const DeviceManagement = () => {
 
   const filteredDevices = getFilteredDevices();
 
-  // Count devices for each tab
   const getDeviceCounts = () => {
     return {
       'All Devices': devices.length,
       'Active': devices.filter(d => d.status === 'Active').length,
-      'Locked': devices.filter(d => d.status === 'Locked').length,
-      'Inactive': devices.filter(d => d.status === 'Inactive').length
+      'Stolen': devices.filter(d => d.status === 'Stolen').length,
+      'Available': devices.filter(d => d.status === 'Available').length,
+      'Recovered': devices.filter(d => d.status === 'Recovered').length
     };
   };
 
   const deviceCounts = getDeviceCounts();
 
-  // Handle selecting all devices
   const handleSelectAll = (checked) => {
     if (checked) {
       const allDeviceIds = filteredDevices.map(d => d.deviceId);
@@ -463,7 +632,6 @@ const DeviceManagement = () => {
     }
   };
 
-  // Handle selecting individual device
   const handleSelectDevice = (deviceId, checked) => {
     const newSelected = new Set(selectedDevices);
     if (checked) {
@@ -474,190 +642,195 @@ const DeviceManagement = () => {
     setSelectedDevices(newSelected);
   };
 
-  // Handle device actions (view, edit, delete)
   const handleDeviceAction = (action, device) => {
     console.log(`Action: ${action}`, device);
     
     if (action === 'view') {
-      // Switch to details view and set the selected device
       setSelectedDevice(device);
       setCurrentView('details');
+    } else if (action === 'flag') {
+      if (confirm(`Flag ${device.deviceName} as stolen?`)) {
+        alert('Flag as stolen functionality - add your logic here');
+      }
     } else {
-      // For other actions, show alert (you can replace with real functionality)
       alert(`${action} action for device: ${device.deviceName}`);
     }
   };
 
-  // Handle going back to device list from details view
   const handleBackToList = () => {
     setCurrentView('list');
     setSelectedDevice(null);
   };
 
-  // Handle button clicks
   const handleFilter = () => {
-    console.log('Filter clicked');
-    alert('Filter functionality - add your logic here');
+    alert('Advanced filter functionality - add your logic here');
   };
 
   const handleExport = () => {
-    console.log('Export clicked');
-    alert('Export functionality - add your logic here');
+    alert('Export device data - add your logic here');
   };
 
-  const handleRegisterDevice = () => {
-    console.log('Register device clicked');
-    alert('Register device functionality - add your logic here');
-  };
-
-  // Conditional rendering: show device list or device details
   if (currentView === 'details' && selectedDevice) {
     return <DeviceDetailsView device={selectedDevice} onBack={handleBackToList} />;
   }
 
-  // Default: show device management list
   return (
-    <div className="min-h-screen bg-[#343264] p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-6 border-b border-[#8D8DC7] pb-6">
+      <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-6">
         <div>
-          <h1 className="text-white text-3xl font-bold">Device Management</h1>
+          <h1 className="text-gray-900 text-3xl font-bold mb-1">Device Management</h1>
+          <p className="text-gray-600 text-sm">Manage all registered devices in the Device Guard platform</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={handleFilter}
-            className="flex items-center gap-2 px-4 py-2 bg-[#8D8DC7] hover:bg-[#BEBEE0] text-white hover:text-[#343264] border border-[#8D8DC7] rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg transition-colors"
           >
             <Filter size={16} />
             Filter
           </button>
           <button 
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 bg-[#8D8DC7] hover:bg-[#BEBEE0] text-white hover:text-[#343264] border border-[#8D8DC7] rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white border border-indigo-600 rounded-lg transition-colors"
           >
             <Download size={16} />
             Export
           </button>
-          <button 
-            onClick={handleRegisterDevice}
-            className="flex items-center gap-2 px-4 py-2 bg-[#BEBEE0] hover:bg-white text-[#343264] rounded-lg transition-colors font-medium"
-          >
-            Register Device
-          </button>
         </div>
       </div>
 
-      {/* Tabs Section */}
-      <div className="flex items-center gap-8 mb-6 border-b border-[#8D8DC7]">
-        {Object.entries(deviceCounts).map(([tab, count]) => (
-          <TabButton
-            key={tab}
-            label={tab}
-            count={count}
-            isActive={activeTab === tab}
-            onClick={() => setActiveTab(tab)}
-          />
-        ))}
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+          <p className="text-gray-600 text-xs font-medium mb-1">Total Devices</p>
+          <p className="text-gray-900 text-2xl font-bold">{deviceCounts['All Devices']}</p>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+          <p className="text-gray-600 text-xs font-medium mb-1">Active</p>
+          <p className="text-gray-900 text-2xl font-bold">{deviceCounts['Active']}</p>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+          <p className="text-gray-600 text-xs font-medium mb-1">Stolen</p>
+          <p className="text-gray-900 text-2xl font-bold">{deviceCounts['Stolen']}</p>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+          <p className="text-gray-600 text-xs font-medium mb-1">Available</p>
+          <p className="text-gray-900 text-2xl font-bold">{deviceCounts['Available']}</p>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+          <p className="text-gray-600 text-xs font-medium mb-1">Recovered</p>
+          <p className="text-gray-900 text-2xl font-bold">{deviceCounts['Recovered']}</p>
+        </div>
       </div>
 
-      {/* Search Section */}
+      {/* Tabs */}
+      <div className="flex items-center gap-1 mb-6 border-b border-gray-200">
+        <TabButton
+          label="All Devices"
+          isActive={activeTab === 'All Devices'}
+          onClick={() => setActiveTab('All Devices')}
+          count={deviceCounts['All Devices']}
+        />
+        <TabButton
+          label="Active"
+          isActive={activeTab === 'Active'}
+          onClick={() => setActiveTab('Active')}
+          count={deviceCounts['Active']}
+        />
+        <TabButton
+          label="Stolen"
+          isActive={activeTab === 'Stolen'}
+          onClick={() => setActiveTab('Stolen')}
+          count={deviceCounts['Stolen']}
+        />
+        <TabButton
+          label="Available"
+          isActive={activeTab === 'Available'}
+          onClick={() => setActiveTab('Available')}
+          count={deviceCounts['Available']}
+        />
+        <TabButton
+          label="Recovered"
+          isActive={activeTab === 'Recovered'}
+          onClick={() => setActiveTab('Recovered')}
+          count={deviceCounts['Recovered']}
+        />
+      </div>
+
+      {/* Search Bar */}
       <div className="mb-6">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8D8DC7]" size={20} />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search by Device ID, Name, or Owner..."
+            placeholder="Search by Device ID, Name, Owner, or IMEI..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#8D8DC7]/20 border border-[#8D8DC7] rounded-lg pl-12 pr-4 py-3 text-white placeholder-[#BEBEE0] focus:outline-none focus:border-[#BEBEE0] transition-colors"
+            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
       </div>
 
-      {/* Table Section */}
-      <div className="bg-[#8D8DC7]/10 rounded-lg border border-[#8D8DC7] overflow-hidden">
+      {/* Device Table */}
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            {/* Table Header */}
-            <thead>
-              <tr className="bg-[#8D8DC7]/20 border-b border-[#8D8DC7]">
-                <th className="px-4 py-4 text-left">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-4 py-3 text-left">
                   <input
                     type="checkbox"
                     checked={selectedDevices.size === filteredDevices.length && filteredDevices.length > 0}
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="w-4 h-4 text-[#8D8DC7] bg-[#343264] border-[#8D8DC7] rounded focus:ring-[#8D8DC7] focus:ring-2"
+                    className="w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2"
                   />
                 </th>
-                <th className="px-4 py-4 text-left text-[#BEBEE0] font-medium text-sm uppercase tracking-wider">
-                  Device ID
-                </th>
-                <th className="px-4 py-4 text-left text-[#BEBEE0] font-medium text-sm uppercase tracking-wider">
-                  Device Name
-                </th>
-                <th className="px-4 py-4 text-left text-[#BEBEE0] font-medium text-sm uppercase tracking-wider">
-                  Owner
-                </th>
-                <th className="px-4 py-4 text-left text-[#BEBEE0] font-medium text-sm uppercase tracking-wider">
-                  Type
-                </th>
-                <th className="px-4 py-4 text-left text-[#BEBEE0] font-medium text-sm uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-4 py-4 text-left text-[#BEBEE0] font-medium text-sm uppercase tracking-wider">
-                  Registration Date
-                </th>
-                <th className="px-4 py-4 text-left text-[#BEBEE0] font-medium text-sm uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-4 py-3 text-left text-gray-700 text-sm font-semibold">Device ID</th>
+                <th className="px-4 py-3 text-left text-gray-700 text-sm font-semibold">Device Name</th>
+                <th className="px-4 py-3 text-left text-gray-700 text-sm font-semibold">Owner</th>
+                <th className="px-4 py-3 text-left text-gray-700 text-sm font-semibold">Shop</th>
+                <th className="px-4 py-3 text-left text-gray-700 text-sm font-semibold">Status</th>
+                <th className="px-4 py-3 text-left text-gray-700 text-sm font-semibold">Registration Date</th>
+                <th className="px-4 py-3 text-left text-gray-700 text-sm font-semibold">Actions</th>
               </tr>
             </thead>
-            
-            {/* Table Body */}
             <tbody>
-              {filteredDevices.map((device) => (
-                <DeviceRow
-                  key={device.deviceId}
-                  device={device}
-                  isSelected={selectedDevices.has(device.deviceId)}
-                  onSelect={(checked) => handleSelectDevice(device.deviceId, checked)}
-                  onAction={handleDeviceAction}
-                />
-              ))}
+              {filteredDevices.length > 0 ? (
+                filteredDevices.map((device) => (
+                  <DeviceRow
+                    key={device.deviceId}
+                    device={device}
+                    isSelected={selectedDevices.has(device.deviceId)}
+                    onSelect={(checked) => handleSelectDevice(device.deviceId, checked)}
+                    onAction={handleDeviceAction}
+                  />
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="px-4 py-8 text-center text-gray-500">
+                    No devices found matching your search criteria
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-
-        {/* Empty State - shows when no devices found */}
-        {filteredDevices.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-[#8D8DC7] mb-4">
-              <Search size={48} className="mx-auto mb-4 opacity-50" />
-            </div>
-            <h3 className="text-[#BEBEE0] text-lg font-medium mb-2">No devices found</h3>
-            <p className="text-[#8D8DC7]">Try adjusting your search terms or filters.</p>
-          </div>
-        )}
       </div>
 
-      {/* Selected Devices Actions - shows when devices are selected */}
+      {/* Selection Info */}
       {selectedDevices.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#343264] border border-[#8D8DC7] rounded-lg px-6 py-4 shadow-lg">
-          <div className="flex items-center gap-4">
-            <span className="text-white font-medium">
-              {selectedDevices.size} device{selectedDevices.size !== 1 ? 's' : ''} selected
-            </span>
-            <div className="flex items-center gap-2">
-              <button className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors">
-                Activate
-              </button>
-              <button className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white rounded text-sm transition-colors">
-                Lock
-              </button>
-              <button className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors">
-                Delete
-              </button>
-            </div>
+        <div className="mt-4 flex items-center justify-between bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+          <span className="text-gray-700">
+            {selectedDevices.size} device{selectedDevices.size !== 1 ? 's' : ''} selected
+          </span>
+          <div className="flex items-center gap-3">
+            <button className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg transition-colors text-sm font-medium">
+              Bulk Export
+            </button>
+            <button className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm font-medium">
+              Bulk Flag
+            </button>
           </div>
         </div>
       )}

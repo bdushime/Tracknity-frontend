@@ -11,16 +11,16 @@ import {
 
 // Enhanced Stat Card Component with trend indicator
 const StatCard = ({ title, value, icon: Icon, iconBg, trend, subtitle }) => (
-  <div className="bg-[#8D8DC7]/10 rounded-2xl p-6 border border-[#8D8DC7] hover:border-[#BEBEE0] transition-all">
+  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all">
     <div className="flex items-start justify-between mb-4">
       <div className="flex-1">
-        <h3 className="text-[#BEBEE0] text-sm font-medium mb-1">{title}</h3>
-        <p className="text-white text-3xl font-bold">{value}</p>
+        <h3 className="text-gray-600 text-sm font-medium mb-1">{title}</h3>
+        <p className="text-gray-900 text-3xl font-bold">{value}</p>
         {subtitle && (
-          <p className="text-[#8D8DC7] text-xs mt-2">{subtitle}</p>
+          <p className="text-gray-500 text-xs mt-2">{subtitle}</p>
         )}
         {trend && (
-          <div className={`flex items-center gap-1 mt-2 text-xs ${trend > 0 ? 'text-green-400' : 'text-red-400'}`}>
+          <div className={`flex items-center gap-1 mt-2 text-xs ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
             <TrendingUp size={14} className={trend < 0 ? 'rotate-180' : ''} />
             <span>{Math.abs(trend)}% from last month</span>
           </div>
@@ -35,13 +35,13 @@ const StatCard = ({ title, value, icon: Icon, iconBg, trend, subtitle }) => (
 
 // Chart Placeholder Component
 const ChartPlaceholder = ({ title, description, height = "h-64" }) => (
-  <div className="bg-[#8D8DC7]/10 rounded-2xl p-6 border border-[#8D8DC7]">
-    <h3 className="text-white text-xl font-semibold mb-6">{title}</h3>
-    <div className={`${height} bg-[#343264]/50 rounded-lg flex items-center justify-center border-2 border-dashed border-[#8D8DC7]`}>
+  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+    <h3 className="text-gray-900 text-xl font-semibold mb-6">{title}</h3>
+    <div className={`${height} bg-gray-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300`}>
       <div className="text-center">
-        <div className="text-[#8D8DC7] text-4xl mb-2">📊</div>
-        <p className="text-[#BEBEE0] text-sm font-medium">Chart Placeholder</p>
-        <p className="text-[#8D8DC7] text-xs mt-1">{description}</p>
+        <div className="text-gray-400 text-4xl mb-2">📊</div>
+        <p className="text-gray-700 text-sm font-medium">Chart Placeholder</p>
+        <p className="text-gray-500 text-xs mt-1">{description}</p>
       </div>
     </div>
   </div>
@@ -51,20 +51,20 @@ const ChartPlaceholder = ({ title, description, height = "h-64" }) => (
 const DashboardHeader = ({ lastUpdated, onRefresh }) => (
   <div className="flex items-center justify-between mb-8">
     <div>
-      <h1 className="text-white text-3xl font-bold">Device Guard Dashboard</h1>
-      <p className="text-[#BEBEE0] text-sm mt-1">Platform overview and system health</p>
+      <h1 className="text-gray-900 text-3xl font-bold">Device Guard Dashboard</h1>
+      <p className="text-gray-600 text-sm mt-1">Platform overview and system health</p>
     </div>
     <div className="flex items-center gap-4">
       <button
         onClick={onRefresh}
-        className="flex items-center gap-2 px-4 py-2 bg-[#8D8DC7] hover:bg-[#8D8DC7]/80 text-white rounded-lg transition-colors"
+        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors shadow-sm"
       >
         <RefreshCw size={16} />
         <span className="text-sm">Refresh</span>
       </button>
       <div className="text-right">
-        <p className="text-[#BEBEE0] text-xs">Last updated</p>
-        <p className="text-white font-medium text-sm">{lastUpdated}</p>
+        <p className="text-gray-500 text-xs">Last updated</p>
+        <p className="text-gray-900 font-medium text-sm">{lastUpdated}</p>
       </div>
     </div>
   </div>
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#343264] p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       {/* Dashboard Header */}
       <DashboardHeader lastUpdated={lastUpdated} onRefresh={handleRefresh} />
 
@@ -127,7 +127,7 @@ const AdminDashboard = () => {
           subtitle={dashboardData.stats.totalShops.subtitle}
           trend={dashboardData.stats.totalShops.trend}
           icon={Store}
-          iconBg="bg-[#8D8DC7]"
+          iconBg="bg-purple-500"
         />
         <StatCard
           title="Total Devices"
@@ -135,7 +135,7 @@ const AdminDashboard = () => {
           subtitle={dashboardData.stats.totalDevices.subtitle}
           trend={dashboardData.stats.totalDevices.trend}
           icon={Smartphone}
-          iconBg="bg-[#8D8DC7]"
+          iconBg="bg-indigo-500"
         />
         <StatCard
           title="Registered Customers"
@@ -143,7 +143,7 @@ const AdminDashboard = () => {
           subtitle={dashboardData.stats.totalCustomers.subtitle}
           trend={dashboardData.stats.totalCustomers.trend}
           icon={Users}
-          iconBg="bg-[#8D8DC7]"
+          iconBg="bg-blue-500"
         />
         <StatCard
           title="Stolen Devices"
@@ -169,7 +169,7 @@ const AdminDashboard = () => {
           value={dashboardData.stats.transfers.value}
           subtitle={dashboardData.stats.transfers.subtitle}
           icon={RefreshCw}
-          iconBg="bg-blue-500"
+          iconBg="bg-cyan-500"
         />
       </div>
 
