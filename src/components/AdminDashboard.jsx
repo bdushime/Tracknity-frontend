@@ -9,8 +9,8 @@ import {
   RefreshCw
 } from 'lucide-react';
 
-// Enhanced Stat Card Component with trend indicator
-const StatCard = ({ title, value, icon: Icon, iconBg, trend, subtitle }) => (
+// Enhanced Stat Card Component
+const StatCard = ({ title, value, icon: Icon, iconBg, subtitle }) => (
   <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all">
     <div className="flex items-start justify-between mb-4">
       <div className="flex-1">
@@ -18,12 +18,6 @@ const StatCard = ({ title, value, icon: Icon, iconBg, trend, subtitle }) => (
         <p className="text-gray-900 text-3xl font-bold">{value}</p>
         {subtitle && (
           <p className="text-gray-500 text-xs mt-2">{subtitle}</p>
-        )}
-        {trend && (
-          <div className={`flex items-center gap-1 mt-2 text-xs ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-            <TrendingUp size={14} className={trend < 0 ? 'rotate-180' : ''} />
-            <span>{Math.abs(trend)}% from last month</span>
-          </div>
         )}
       </div>
       <div className={`p-3 rounded-xl ${iconBg}`}>
@@ -125,7 +119,6 @@ const AdminDashboard = () => {
           title="Partner Shops"
           value={dashboardData.stats.totalShops.value}
           subtitle={dashboardData.stats.totalShops.subtitle}
-          trend={dashboardData.stats.totalShops.trend}
           icon={Store}
           iconBg="bg-purple-500"
         />
@@ -133,7 +126,6 @@ const AdminDashboard = () => {
           title="Total Devices"
           value={dashboardData.stats.totalDevices.value}
           subtitle={dashboardData.stats.totalDevices.subtitle}
-          trend={dashboardData.stats.totalDevices.trend}
           icon={Smartphone}
           iconBg="bg-indigo-500"
         />
@@ -141,7 +133,6 @@ const AdminDashboard = () => {
           title="Registered Customers"
           value={dashboardData.stats.totalCustomers.value}
           subtitle={dashboardData.stats.totalCustomers.subtitle}
-          trend={dashboardData.stats.totalCustomers.trend}
           icon={Users}
           iconBg="bg-blue-500"
         />
@@ -149,7 +140,6 @@ const AdminDashboard = () => {
           title="Stolen Devices"
           value={dashboardData.stats.stolenDevices.value}
           subtitle={dashboardData.stats.stolenDevices.subtitle}
-          trend={dashboardData.stats.stolenDevices.trend}
           icon={Shield}
           iconBg="bg-red-500"
         />
