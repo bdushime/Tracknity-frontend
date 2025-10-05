@@ -120,7 +120,7 @@ const AdminDashboard = () => {
           value={dashboardData.stats.totalShops.value}
           subtitle={dashboardData.stats.totalShops.subtitle}
           icon={Store}
-          iconBg="bg-purple-500"
+          iconBg="bg-purple-600"
         />
         <StatCard
           title="Total Devices"
